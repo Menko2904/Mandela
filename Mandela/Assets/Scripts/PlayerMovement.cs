@@ -50,19 +50,6 @@ public class PlayerMovement : MonoBehaviour
 
         Controller.Move(CurrentMoveVelocity * Time.deltaTime); 
 
-        Ray groundcheck = new Ray(transform.position, Vector3.down);
-        if (Physics.Raycast(groundcheck, 1.1f))
-        {
-            CurrentForceVelocity.y = -2f;
-
-             if (Input.GetKeyDown("space"))
-            {
-                CurrentForceVelocity.y = JumpStregth;
-            }
-        }
-        else
-        {
-            CurrentForceVelocity.y -= GravityStrength * Time.deltaTime;
-        }
+       
     }
 }
