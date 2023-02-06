@@ -5,51 +5,45 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
 
-    public float MoveSmoothTime;
-    public float GravityStrength;
-    public float JumpStregth;
-    public float WalkSpeed;
-    public float Runspeed;
+    public CharacterController controller; 
 
-    private CharacterController Controller;
-    private Vector3 CurrentMoveVelocity;
-    private Vector3 MoveDamoVelocity;
+    public float walkSpeed = 12f;
+    public float runSpeed = 20f;
+    public float gravity = -9.81f;
+    public float jumpHeight = 3f;
 
-    private Vector3 CurrentForceVelocity; 
+    public Transform groundCheck;
+    public float groundDistance = 0.4f;
+    public LayerMask groundMask;
 
-    
-    void Start()
-    {
-        Controller = GetComponent<CharacterController>();
-    }
-
+    Vector3 velocity;
+    bool isGrounded;
     
     void Update()
     {
-        Vector3 PlayerInput = new Vector3
+        isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
+
+        if (isGrounded && velocity.y < 0)
         {
-            x = Input.GetAxisRaw("Horizontal"),
-            y = 0f,
-            z = Input.GetAxisRaw("Vertical")
-        };
-   
-   if (PlayerInput.magnitude > 1f)
-        {
-            PlayerInput.Normalize();
+            velocity.y = -2f;
         }
-   
-        Vector3 MoveVector = transform.TransformDirection(PlayerInput);
-        float CurrentSpeed = Input.GetKeyDown(KeyCode.LeftShift) ? Runspeed : WalkSpeed; 
 
-        CurrentMoveVelocity = Vector3.SmoothDamp(
-            CurrentMoveVelocity,
-            MoveVector * CurrentSpeed,
-            ref MoveDamoVelocity,
-            MoveSmoothTime
-        );
+        if (Input.GetButtonDown("Jump") && isGrounded)
+        {
+            velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+        }
 
-        Controller.Move(CurrentMoveVelocity * Time.deltaTime); 
 
-       
+        float x = Input.GetAxis("Horizontal");
+        float z = Input.GetAxis("Vertical");
+
+        Vector3 move = transform.right * x + transform.forward * z;
+
+        controller.Move(move * walkSpeed * Time.deltaTime);
+
+        velocity.y += gravity * Time.deltaTime;
+
+        controller.Move(velocity * Time.deltaTime);
     }
 }
+
