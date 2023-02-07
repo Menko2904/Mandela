@@ -11,10 +11,9 @@ public class PlayerMovement : MonoBehaviour
     public float gravity = -9.8f;
     public float jumpHeight = 3f;
     public float movement; 
-    public float crouchingHeight; 
-    public float standingHeight;
-
-    public bool isCrouching;    
+    public float normalHeight;
+    public float crouchHeight;
+ 
     public bool isSprinting = false;
     public float sprintingMultiplier = 30f;
 
@@ -36,6 +35,7 @@ public class PlayerMovement : MonoBehaviour
         }
 
         float x = Input.GetAxis("Horizontal");
+        
         float z = Input.GetAxis("Vertical");
 
 
@@ -60,25 +60,15 @@ public class PlayerMovement : MonoBehaviour
             isSprinting = false;
         }
 
-        if (Input.GetKey(KeyCode.LeftControl))
+        if(Input.GetKeyDown(KeyCode.LeftControl))
         {
-            isCrouching = true;
+             controller.height = crouchHeight;
         }
-        else
+        if(Input.GetKeyUp(KeyCode.LeftControl))
         {
-            isCrouching = false;
+            controller.height = normalHeight;
         }
-
-        if (isCrouching = true)
-        {
-            controller.height = crouchingHeight;
-        }
-        else
-        {
-            controller.height = standingHeight;
-        }
-    
-
+        
         Vector3 movement = new Vector3();
 
         movement = x * transform.right + z * transform.forward;
