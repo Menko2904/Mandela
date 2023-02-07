@@ -595,10 +595,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   controller: {fileID: 1996020982}
-  walkSpeed: 12
-  runSpeed: 20
+  speed: 12
   gravity: -9.81
   jumpHeight: 3
+  movement: 1
+  crouchingHeight: 1.7
+  standingHeight: 1.8
+  isCrouching: 0
+  isSprinting: 0
+  sprintingMultiplier: 2
   groundCheck: {fileID: 950531809}
   groundDistance: 0.4
   groundMask:

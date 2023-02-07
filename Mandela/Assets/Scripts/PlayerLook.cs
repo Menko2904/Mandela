@@ -31,5 +31,6 @@ public class PlayerLook : MonoBehaviour
 
         transform.eulerAngles = new Vector3(0f, XYRotation.y, 0f);
         PlayerCamera.localEulerAngles = new Vector3(XYRotation.x, 0f, 0f);
+
     }
 }
