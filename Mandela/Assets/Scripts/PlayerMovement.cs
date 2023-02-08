@@ -5,64 +5,82 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
 
-    public float MoveSmoothTime;
-    public float GravityStrength;
-    public float JumpStregth;
-    public float WalkSpeed;
-    public float Runspeed;
+    public CharacterController controller;
 
-    private CharacterController Controller;
-    private Vector3 CurrentMoveVelocity;
-    private Vector3 MoveDamoVelocity;
+    public float speed = 12f;
+    public float gravity = -9.8f;
+    public float jumpHeight = 3f;
+    public float movement; 
+    public float normalHeight;
+    public float crouchHeight;
+ 
+    public bool isSprinting = false;
+    public float sprintingMultiplier = 30f;
 
-    private Vector3 CurrentForceVelocity; 
+    public Transform groundCheck;
+    public float groundDistance = 0.4f;
+    public LayerMask groundMask;
 
-    
-    void Start()
-    {
-        Controller = GetComponent<CharacterController>();
-    }
+    Vector3 velocity;
+    bool isGrounded;
 
     
     void Update()
     {
-        Vector3 PlayerInput = new Vector3
+        isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
+
+        if(isGrounded && velocity.y < 0)
         {
-            x = Input.GetAxisRaw("Horizontal"),
-            y = 0f,
-            z = Input.GetAxisRaw("Vertical")
-        };
-   
-   if (PlayerInput.magnitude > 1f)
-        {
-            PlayerInput.Normalize();
+            velocity.y = -2f;
         }
-   
-        Vector3 MoveVector = transform.TransformDirection(PlayerInput);
-        float CurrentSpeed = Input.GetKeyDown(KeyCode.LeftShift) ? Runspeed : WalkSpeed; 
 
-        CurrentMoveVelocity = Vector3.SmoothDamp(
-            CurrentMoveVelocity,
-            MoveVector * CurrentSpeed,
-            ref MoveDamoVelocity,
-            MoveSmoothTime
-        );
+        float x = Input.GetAxis("Horizontal");
+        
+        float z = Input.GetAxis("Vertical");
 
-        Controller.Move(CurrentMoveVelocity * Time.deltaTime); 
 
-        Ray groundcheck = new Ray(transform.position, Vector3.down);
-        if (Physics.Raycast(groundcheck, 1.1f))
+        Vector3 move = transform.right * x + transform.forward * z;
+
+
+        controller.Move(move * speed * Time.deltaTime);
+
+
+        if (Input.GetButtonDown("Jump") && isGrounded)
         {
-            CurrentForceVelocity.y = -2f;
 
-             if (Input.GetKeyDown("space"))
-            {
-                CurrentForceVelocity.y = JumpStregth;
-            }
+            velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+        }
+
+        if (Input.GetKey(KeyCode.LeftShift))
+        {
+            isSprinting = true;
         }
         else
         {
-            CurrentForceVelocity.y -= GravityStrength * Time.deltaTime;
+            isSprinting = false;
         }
+
+        if(Input.GetKeyDown(KeyCode.LeftControl))
+        {
+             controller.height = crouchHeight;
+        }
+        if(Input.GetKeyUp(KeyCode.LeftControl))
+        {
+            controller.height = normalHeight;
+        }
+        
+        Vector3 movement = new Vector3();
+
+        movement = x * transform.right + z * transform.forward;
+
+        if (isSprinting == true)
+        {
+            movement *= sprintingMultiplier;
+        }
+
+        velocity.y += gravity * Time.deltaTime;
+
+        controller.Move(movement * speed * Time.deltaTime);
+        controller.Move(velocity * Time.deltaTime);
     }
 }
